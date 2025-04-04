@@ -156,7 +156,8 @@ def SimulateCA(cellautomaton0: np.ndarray, f, neighborhood=Moore(1), duration: i
             
         else:
             indices_2d = np.indices((n,n))
-            indices = np.array([[(indices_2d[0, 0, i], indices_2d[1, 0, j]) for j in range(n)] for i in range(n)])
+            #indices = np.array([[(indices_2d[0, 0, i], indices_2d[1, 0, j]) for j in range(n)] for i in range(n)])
+            indices = np.stack((indices_2d[0], indices_2d[1]), axis=2)
             mooreshift_indices = np.array([np.roll(indices, dis, axis=(0, 1)) for dis in neighborhood])  # Copies of CA cyclically shifted according to Moore's neighborhood
             neighborsgrid_indices = list(np.transpose(mooreshift_indices, axes=(1, 2, 0, 3)))  # Transposition to obtain a 2D array of neighbor lists
             canew = cellautomaton.copy()
