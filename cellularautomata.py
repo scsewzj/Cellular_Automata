@@ -109,7 +109,7 @@ def DrawCA(cellautomaton: np.ndarray, colors: list, ax):
     )
 
 
-def SimulateCA(cellautomaton0: np.ndarray, f, neighborhood=Moore(1), duration: int = 100, global_fn = None) -> list:
+def SimulateCA(cellautomaton0: np.ndarray, f, neighborhood=Moore(1), duration: int = 100, global_fn = None, extend = False) -> list:
     """Compute a simulation of a cellular automaton.
 
     Args:
@@ -135,23 +135,32 @@ def SimulateCA(cellautomaton0: np.ndarray, f, neighborhood=Moore(1), duration: i
     
         def wrapper(*args, **kwargs):
             result = ca_step(*args, **kwargs)
-            print("** CA STEP: ", result)
+            #print("** CA STEP: ", result)
             if global_fn is not None:
                 result = global_fn(result)
-                print("** CA STEP with global function: ", result)
+                #print("** CA STEP with global function: ", result)
             return result
         return wrapper
     
     
     @global_ca_step
-    def ca_step(cellautomaton: np.ndarray, fun) -> np.ndarray:  # Compute 1 CA step.
+    def ca_step(cellautomaton: np.ndarray, fun, extend = extend) -> np.ndarray:  # Compute 1 CA step.
         # Displacement of the Moore neighborhood.
         n = len(cellautomaton)
         mooreshift = np.array([np.roll(cellautomaton, dis, axis=(0, 1)) for dis in neighborhood])  # Copies of CA cyclically shifted according to Moore's neighborhood
         neighborsgrid = list(np.transpose(mooreshift, axes=(1, 2, 0, 3)))  # Transposition to obtain a 2D array of neighbor lists
-        canew = np.array(
-            [[fun(cellautomaton[k][j], neighborsgrid[k][j]) for j in range(n)] for k in range(n)]
-        )  # apply the local evolution function
+        if not extend:
+            canew = np.array(
+                [[fun(cellautomaton[k][j], neighborsgrid[k][j]) for j in range(n)] for k in range(n)]
+            )  # apply the local evolution function
+            
+        else:
+            indices_2d = np.indices((n,n))
+            indices = np.array([[(indices_2d[0, 0, i], indices_2d[1, 0, j]) for j in range(n)] for i in range(n)])
+            mooreshift_indices = np.array([np.roll(indices, dis, axis=(0, 1)) for dis in neighborhood])  # Copies of CA cyclically shifted according to Moore's neighborhood
+            neighborsgrid_indices = list(np.transpose(mooreshift_indices, axes=(1, 2, 0, 3)))  # Transposition to obtain a 2D array of neighbor lists
+            canew = cellautomaton.copy()
+            canew = fun(canew, neighborsgrid_indices)
         return canew
 
     simulation = [cellautomaton0]
@@ -433,7 +442,8 @@ def GuiCA(
         gridsize: int = 100,
         duration: int = 200,
         delay: int = 100,
-        global_fn = None
+        global_fn = None,
+        extend: bool = False
 ):
     """Graphical interface for cellular Automata.
         The number of different cell types is limited to 10 at most.
@@ -730,7 +740,7 @@ def GuiCA(
         if _ca0 is None:  # When CA0 is not yet generated.
             _ca0 = GenerateCA(_gridsize, cellcolors, weights.weights)
 
-        simulation = SimulateCA(_ca0, local_fun, neighborhood=_neighborfun(_radius), duration=_duration, global_fn=global_fn)
+        simulation = SimulateCA(_ca0, local_fun, neighborhood=_neighborfun(_radius), duration=_duration, global_fn=global_fn, extend=extend)
         _animation = ShowSimulation(simulation, cellcolors, figheight=figheight, delay=delay)
 
     run_button.on_clicked(runclick)  # Event on button
