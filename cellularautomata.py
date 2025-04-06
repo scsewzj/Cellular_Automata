@@ -201,7 +201,7 @@ _save_button = None  # Button to save Simulation.
 _curve_button = None  # CheckBox Button for curves.
 
 
-def ShowSimulation(simulation: list, cellcolors: dict[tuple, str], figheight: int = 5, delay: int = 100):
+def ShowSimulation(simulation: list, cellcolors: dict[tuple, str], figheight: int = 5, delay: int = 100, outfile: str = "simulation.txt") -> FuncAnimation:
     """Display the simulation trace of a cellular automaton.
 
     Args:
@@ -287,6 +287,12 @@ def ShowSimulation(simulation: list, cellcolors: dict[tuple, str], figheight: in
             visible=visible_curves[i],
         )[0]
         for i, category in enumerate(types)}
+    
+    if outfile is not None:
+        outfile = open(outfile, "w")  # Open the output file to write the simulation.
+        typelist = list(types.keys())
+        for i in typelist:
+            print((i,typescount[i]), file=outfile)
 
     # || Check box button characterization for curves
     chxboxheight = len(types) * 0.05  # Check box height which depends on the number of categories.
@@ -444,7 +450,8 @@ def GuiCA(
         duration: int = 200,
         delay: int = 100,
         global_fn = None,
-        extend: bool = False
+        extend: bool = False,
+        outfile: str = None  # File name for the simulation output.
 ):
     """Graphical interface for cellular Automata.
         The number of different cell types is limited to 10 at most.
@@ -742,7 +749,7 @@ def GuiCA(
             _ca0 = GenerateCA(_gridsize, cellcolors, weights.weights)
 
         simulation = SimulateCA(_ca0, local_fun, neighborhood=_neighborfun(_radius), duration=_duration, global_fn=global_fn, extend=extend)
-        _animation = ShowSimulation(simulation, cellcolors, figheight=figheight, delay=delay)
+        _animation = ShowSimulation(simulation, cellcolors, figheight=figheight, delay=delay, outfile=outfile)
 
     run_button.on_clicked(runclick)  # Event on button
 
