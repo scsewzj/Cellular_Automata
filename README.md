@@ -1,3 +1,8 @@
+# Tumor Dynamics Global Cellular Automaton
+
+Author: [@Zhouji WU](https://github.com/scsewzj), [@Priyasha PAUL](https://github.com/Priyasha14), [@Frank DELAPLACE](https://github.com/Franck-Delaplace)
+GitHub Repository URL: [Cellular_Automata](https://github.com/scsewzj/Cellular_Automata)
+
 ## Local CA Engine Installation
 
 Library of cellular automaton written in Python with examples including the game of life.
