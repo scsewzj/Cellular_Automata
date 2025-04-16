@@ -27,7 +27,7 @@ RTC_INIT = {
  'pmax': 10}
 
 STC_INIT = {
- 'CCT': 1,
+ 'CCT': 24,
  'dtp': 1,
  'u': 10/24,
  'dtu': 1.0,
@@ -36,7 +36,7 @@ STC_INIT = {
  'pmax': 10}
 
 TSTC_INIT = {
- 'CCT': 1,
+ 'CCT': 24,
  'dtp': 1,
  'u': 10/24,
  'dtu': 1.0,
